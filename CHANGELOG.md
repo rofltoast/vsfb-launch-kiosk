@@ -4,6 +4,17 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v105 — 2026-04
+- Restructured the README to lead with ambient + live (the actual app)
+  instead of the optional 24/7 broadcast. Added screenshots of all four
+  view variants (ambient × {polished, terminal}, live × {polished,
+  terminal}). New banner image at the top.
+
+## v104 — 2026-04
+- Initial public GitHub release. Repo cleaned, documented, MIT-licensed,
+  pushed to `rofltoast/vsfb-launch-kiosk`. Deploy artifacts gathered
+  under `deploy/stream/` with their own README.
+
 ## v103 — 2026-04
 - Nudged the Falcon 9 silhouette in the ambient VEHICLE box a few
   pixels right (closer to the box edge) in both terminal and polished

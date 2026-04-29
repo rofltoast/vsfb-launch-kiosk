@@ -1,97 +1,115 @@
-# VSFB Launch Kiosk 🚀📺
+<div align="center">
 
-> *A 24/7 retro-broadcast TV channel and an ambient launch tracker, all in one
-> Vite + React app. Because the only thing more fun than watching SpaceX
-> launch a rocket is watching it on a CRT-styled cable channel that you
-> built yourself in your garage.*
+![VSFB Launch Kiosk · Upcoming Rocket Launches · Live Telemetry](docs/banner.svg)
 
-This is a glorified browser tab that I refuse to admit is a glorified
-browser tab. It pulls live data from Launch Library 2, the National
-Weather Service, and FlightClub.io, mixes it with hand-tuned retro
-typography, ham-radio energy, and a cursed amount of CSS, and pumps
-the result onto a 24/7 YouTube Live stream of a fake cable channel.
+# VSFB Launch Kiosk
 
-It also has a normal mode for when you'd like to know when the next
-launch is without committing to a full broadcast aesthetic.
+**A wall-mountable, browser-based launch monitor for SpaceX flights from
+Vandenberg Space Force Base. Two views: a calm "while-you-wait" ambient
+mode and a real-time trajectory + telemetry live mode. React + Vite, no
+backend, runs anywhere a browser does.**
+
+</div>
 
 ---
 
-## What it does (in three flavors)
+## Two views, one app
 
-### 1. `/` — Ambient Mode (the polite one)
-The "while-you-wait" view. Big T-minus countdown, GO-FOR-LAUNCH pill,
-mission stats, weather card, viewing-conditions score, upcoming-launch
-list, rotating quick-fact card. Two layouts to choose from:
+This is what you stick on a TV in your office, on a 10" Pi touchscreen
+in your living room, or on the iPad on your kitchen counter. It pulls
+real launch + weather data, looks great, and takes care of itself —
+auto-flipping into live mode when something is about to launch and back
+to ambient when it's over.
 
-- **Terminal** — the original aesthetic. Bracketed `[ TITLE ]` boxes,
-  ANSI-flavored palettes, monospace-forward, *btop++ but for rockets*.
-- **Polished** — cinematic broadcast vibes. Photo-real Falcon-9-on-pad
-  hero behind a giant magenta countdown, glowing GO/NO-GO pill, rounded
-  cards. Looks great on a TV.
+## 🛰️ Ambient mode — the "while you wait" view
 
-Press `Y` to flip layouts, `T` for the theme picker, `1`–`7` to jump
-straight to a palette. Phones get a 🎨 button bottom-right since
-phones don't have a `T` key (sorry, future).
+![Ambient — polished layout](docs/screenshots/ambient-polished.png)
 
-### 2. `/` — Live Mode (the loud one)
-Auto-engages 20 minutes before T-0. The trajectory graph becomes the
-hero — a real-time altitude-vs-downrange plot drawing in the rocket's
-path as it climbs, with event markers (Max-Q, MECO, stage sep, SES-1,
-landing burn, SECO, deploy) lighting up as they happen. There's a
-small embedded webcast in the corner and a scrolling event log. If
-FlightClub is unreachable, it gracefully falls back to a built-in
-nominal Falcon 9 ascent profile because *the show must go on*.
+The default view, shown 24/7 except during a live ascent. Pulls the
+next-launch information from Launch Library 2 and the weather from NWS,
+mixes in a rotating fact card so the screen has motion, and updates
+itself in the background while you go back to whatever you were doing.
 
-### 3. `/retro` — Retro-Broadcast Mode (the unhinged one)
-This is the YouTube Live channel. A full-screen CRT-styled "VSFB-TV"
-broadcast complete with:
+**What you see:**
 
-- **Slideshow rotation**: next-launch hero, upcoming schedule,
-  Central Coast weather map (5 stations, live NWS data), DID-YOU-KNOW
-  fact cards, MGS-style codec portraits of people who definitely work
-  at the station (it's me, I'm the people).
-- **Bottom ticker** with launch + weather data, brand chyrons, and
-  the occasional silly aside.
-- **Six "skits"** rendered as video commercials between cycles, with
-  a "COMMERCIAL IN PROGRESS" badge so the viewer knows we're not just
-  glitching.
-- **A 24/7 stream** that pumps this whole thing into YouTube Live via
-  a headless Chrome → Xvfb → x11grab → ffmpeg → RTMP pipeline running
-  on a tiny VPS.
+- 🚀 **Next launch hero** — mission name, rocket, pad, GO/NO-GO status
+  pill, photographic Falcon-9-on-pad backdrop (in polished layout)
+- ⏱ **Big T-minus countdown** with hours / minutes / seconds broken
+  into broadcast-clock digits
+- 🗓 **Liftoff timestamp** in Pacific time + 24-hour countdown progress bar
+- 📋 **Mission card** — payload, customer, orbit, mission type, pad,
+  recovery (RTLS / droneship / expendable)
+- 🔧 **Vehicle card** — rocket model, height, diameter, mass, thrust,
+  to-LEO mass, plus booster serial + flight count + reuse stats
+- 🌤 **Weather card** — temp, conditions, wind (with compass direction),
+  humidity, cloud cover, and a 0-100 "viewing conditions" score
+- 📅 **Upcoming launches** — the next 6 VSFB flights, with rideshare
+  grouping (`Transporter 17 · Dedicated SSO Rideshare`)
+- 💡 **Rotating fact card** — a launch-history / vehicle-trivia rotator
+  that changes every ~8 seconds so the screen never looks dead
+- ⚠ **Sonic boom warning** — auto-shown when the booster is doing an
+  RTLS landing (LZ-4 booms inland over Lompoc and Santa Maria)
 
-It also has `/admin/retro`, a recorder for cutting new narration takes
-without leaving the browser. Never gets old.
+### Two layouts to choose from
 
----
+Same data, different vibe. Press `Y` to flip.
 
-## Hardware (a.k.a. why this exists)
+**Polished** — cinematic broadcast aesthetic, the screenshot above.
+Photo hero, big magenta countdown, glowing GO/NO-GO pill, rounded
+cards. Designed to look great on a TV from across the room.
 
-This started as a wall-mountable launch ticker for my office. It is
-now several things:
+**Terminal** — the original aesthetic. Bracketed `[ TITLE ]` boxes,
+flat ANSI palettes, monospace-forward, *btop++ but for rockets*.
 
-- A **portable Pi 4** in a 3D-printed case with a Waveshare 10.1"
-  touchscreen and a UPS HAT, so I can take it outside and watch the
-  actual rocket while watching a screen show me where the actual
-  rocket is. Recursion.
-- A **24/7 YouTube Live stream** from a cheap Hetzner VPS so anyone,
-  anywhere, can pretend they have a Vandenberg launch monitor in
-  their living room.
-- A **dev environment** where I add features at 2am and call it
-  "production".
+![Ambient — terminal layout](docs/screenshots/ambient-terminal.png)
 
-Recommended portable build (none of this is required to run the
-software — it's a web app, you can open it on a laptop):
-
-| Part | Notes |
-|---|---|
-| Raspberry Pi 4 (4 GB) | Pi 5 also works; lower power draw on the 4. |
-| Waveshare 10.1" HDMI IPS touchscreen | 400+ nits is the bare minimum for outdoor sun. |
-| Waveshare UPS HAT (C) + 2× 18650 | Couple hours unplugged + clean shutdown. |
-| 3D-printed enclosure | Whatever fits your printer. |
+Mix and match: 7 terminal palettes (tokyo-storm, gruvbox, dracula, nord,
+matrix, catppuccin, solarized) and 6 polished palettes (cosmic-dusk,
+aurora, ember, midnight-ops, graphite, sunrise). Press `T` to open the
+theme picker, `1`–`7` to jump to a palette directly. On phones, tap the
+🎨 button bottom-right to cycle.
 
 ---
 
-## Quick start (the boring 30 seconds)
+## 🔥 Live mode — the "it's actually happening" view
+
+![Live — polished layout](docs/screenshots/live-polished.png)
+
+Auto-engages **20 minutes before T-0** when the launch is `GO`, and
+keeps running until ~10 minutes after the second-stage SECO. The whole
+screen rearranges around the trajectory.
+
+**What you see:**
+
+- 🎯 **Real-time trajectory plot** — altitude (mi) vs. downrange (mi)
+  with the rocket's path drawing in as it climbs. Event markers for
+  liftoff, max-Q, MECO, stage-sep, SES-1, fairing sep, entry burn,
+  landing burn, droneship landing, SECO, payload deploy
+- ⏱ **Mission clock** front and center — `T+00:00:08 · ASCENT`, with
+  the next event ("MAX-Q in 01:04") highlighted top-right
+- 📊 **Telemetry rail** — ALT, VEL, downrange, dynamic pressure (Q),
+  current stage, status, single/dual-stage mode
+- 📺 **Embedded webcast** — the official YouTube webcast in a corner
+  iframe so you don't have to open another tab
+- 🪂 **Landing-zone card** — drone ship name (`OCISLY · Of Course I Still
+  Love You`) or LZ designation, depending on the mission profile
+- 📜 **Event timeline strip** — every flight event lined up at the
+  bottom, lighting up as they happen
+- 🛟 **Graceful degradation** — if FlightClub.io errors, the trajectory
+  falls back to a built-in nominal Falcon 9 ascent profile so the show
+  goes on regardless
+
+### Live mode also has a terminal layout
+
+![Live — terminal layout](docs/screenshots/live-terminal.png)
+
+Same data, TUI brackets: `[ MISSION CLOCK ]`, `[ TRAJECTORY ]`,
+`[ WEBCAST ]`, `[ TELEMETRY ]`, `[ EVENTS ]`. Toggle with `Y` like the
+ambient view.
+
+---
+
+## Quick start
 
 ```bash
 git clone https://github.com/rofltoast/vsfb-launch-kiosk.git
@@ -110,10 +128,41 @@ npm run build
 # dist/ is now a static site. Drop it into nginx, Caddy, S3, whatever.
 ```
 
-For the full retro-broadcast 24/7 stream pipeline (Xvfb + headless
-Chrome + ffmpeg → RTMP), see `deploy/` for the systemd unit, the
-nginx site config, and the run script. You'll need a YouTube Live
-stream key. You'll also need patience. Also coffee.
+---
+
+## Hardware (a.k.a. why this exists)
+
+This started as a wall-mountable launch ticker for my office. It is
+now several things, including a portable Pi 4 in a 3D-printed case
+with a touchscreen and a UPS HAT, so I can take it outside and watch
+the actual rocket while watching a screen show me where the actual
+rocket is. Recursion.
+
+Recommended portable build (none of this is required to run the
+software — it's a web app, you can open it on a laptop):
+
+| Part | Notes |
+|---|---|
+| Raspberry Pi 4 (4 GB) | Pi 5 also works; lower power draw on the 4. |
+| Waveshare 10.1" HDMI IPS touchscreen | 400+ nits is the bare minimum for outdoor sun. |
+| Waveshare UPS HAT (C) + 2× 18650 | Couple hours unplugged + clean shutdown. |
+| 3D-printed enclosure | Whatever fits your printer. |
+
+---
+
+## Keyboard hotkeys (desktop)
+
+| Key | What |
+|---|---|
+| `T` | toggle theme picker |
+| `1`–`7` | jump to palette N (terminal: 7 palettes; polished: 6) |
+| `Y` | toggle layout picker |
+| `Shift+Y` | flip directly between terminal ↔ polished |
+| `L` | mark a "liftoff anchor" (manual T-0 override for testing live mode) |
+| `Shift+L` | clear the liftoff anchor |
+
+On mobile the 🎨 button bottom-right cycles themes. There is no `T`
+key on a phone. We have made peace with this.
 
 ---
 
@@ -134,96 +183,52 @@ src/
 │   ├── LiveTerminalLayout       same data, TUI flavor
 │   ├── TrajectoryGraph.jsx      real-time alt-vs-downrange plot
 │   ├── ThemePicker / LayoutPicker / MobileThemeButton
-│   └── retro/                   the /retro CRT broadcast app
+│   └── retro/                   the optional /retro CRT broadcast app
 ├── lib/
-│   ├── ll2.js                Launch Library 2 client (cached via nginx)
+│   ├── ll2.js                Launch Library 2 client
 │   ├── flightclub.js         trajectory simulation client
 │   ├── weather.js            NWS / Open-Meteo + viewing-score model
-│   ├── quick-facts.js        rotating fact pool, both ambient and retro
+│   ├── quick-facts.js        rotating fact pool
 │   ├── upcoming.js           rideshare grouping, NET parsing
 │   └── hooks.js              countdown timers, polling intervals
-├── retro/lib/
-│   ├── useRetroData.js       LL2 + NWS + facts hook, status-aware
-│   ├── nws.js                CWA observations + forecast
-│   ├── slots.js              weather-map station list
-│   └── useNarration.js       voice clip rotation
 └── styles/
     ├── base.css              the kiosk app
-    ├── themes.css            13+ palettes, terminal + polished
-    └── ../retro/styles/retro.css   the retro-broadcast app
+    └── themes.css            13 palettes, terminal + polished
 ```
 
-### Themes
+### Data sources
 
-The theme system is two parallel sets of palettes — **terminal** and
-**polished** — applied via `data-theme` and `data-layout` attributes
-on `<html>`. Flat ANSI colors for the TUI feel, hand-tuned cinematic
-gradients for the polished. Mix and match: "terminal layout +
-dracula" and "polished layout + midnight ops" both work, both look
-good, neither is correct.
+- **[Launch Library 2](https://thespacedevs.com/llapi)** — schedule,
+  mission name, rocket, pad, NET, landing attempt, status. Polled
+  every 5 minutes.
+- **[National Weather Service](https://www.weather.gov/)** — KLPC
+  observations + LOX gridpoint forecast. Drives the weather card and
+  the viewing-conditions score.
+- **[FlightClub.io](https://flightclub.io/)** — trajectory simulation
+  for live mode. Falls back to a built-in nominal Falcon 9 ascent
+  profile if the API errors.
+- **YouTube** — webcast embed. Just an iframe.
 
-### Data flow
-
-1. **Launch Library 2** — schedule, mission name, rocket, pad, NET,
-   landing attempt, status. Polled every 5 minutes. Cached at the
-   nginx layer with `proxy_cache_use_stale` so a flaky upstream
-   doesn't blank the screen.
-2. **National Weather Service** — KLPC observations + LOX gridpoint
-   forecast. Drives the Central Coast weather map and the viewing-
-   conditions score. Same caching story.
-3. **FlightClub.io** — trajectory simulation. Used by the live mode
-   to draw the rocket's path. Falls back to a built-in nominal
-   Falcon 9 ascent profile if the API errors.
-4. **YouTube** — webcast embed. Just an iframe.
-
-### The 24/7 stream pipeline (a.k.a. the cursed part)
-
-Living in `deploy/` and explained more in code comments:
-
-```
-              ┌─────────────────┐
-              │  /retro SPA     │
-              │  (this repo)    │
-              └────────┬────────┘
-                       │ rendered into
-              ┌────────▼────────┐
-              │   headless      │
-              │   Chrome        │ on Xvfb :99
-              └────────┬────────┘
-                       │ x11grab
-              ┌────────▼────────┐  ← PulseAudio null-sink
-              │     ffmpeg      │     captures Chrome audio
-              │  libx264 → RTMP │
-              └────────┬────────┘
-                       │
-              ┌────────▼────────┐
-              │ YouTube Live    │
-              └─────────────────┘
-```
-
-Yes, the cursor is invisible. Yes, that took three iterations. Yes,
-there's now a 16×16 all-zero XBM bitmap doing the work that
-`-nocursor` was supposed to do. Yes, I'm fine.
+No backend. The kiosk is a pure static SPA. If you want to deploy
+behind your own nginx with a CORS-friendly cache for LL2 + NWS, see
+`deploy/stream/nginx-vsfb-kiosk.conf` for a reverse-proxy config.
 
 ---
 
-## Keyboard hotkeys (desktop)
+## Bonus: `/retro` — a 24/7 broadcast mode
 
-| Key | What |
-|---|---|
-| `T` | toggle theme picker |
-| `1`–`7` | jump to palette N (terminal: 7 palettes; polished: 6) |
-| `Y` | toggle layout picker |
-| `Shift+Y` | flip directly between terminal ↔ polished |
-| `L` | mark a "liftoff anchor" (manual T-0 override for testing) |
-| `Shift+L` | clear the liftoff anchor |
-
-On mobile the 🎨 button bottom-right cycles themes. There is no `T`
-key on a phone. We have made peace with this.
+There's also a hidden `/retro` route that turns the whole thing into
+a CRT-styled "VSFB-TV" cable channel: slideshow rotation, MGS-style
+codec portraits, scrolling ticker, rotating commercials. I run it on
+a tiny VPS pointed at YouTube Live. If you want to do the same, see
+[`deploy/stream/README.md`](deploy/stream/README.md) for the systemd
+unit, the nginx config, the Xvfb + ffmpeg pipeline, and the curse
+incantations required to make the X cursor invisible. It is entirely
+optional and unrelated to the main app.
 
 ---
 
-## Acknowledgements + apologies
+## Acknowledgements
 
 - [The Space Devs](https://thespacedevs.com/) for Launch Library 2.
   Their API is free, fast, and a lifeline.
@@ -234,7 +239,7 @@ key on a phone. We have made peace with this.
 - Every single SpaceX webcast caster who's said "stage sep
   confirmed" calmly while a robot landed itself on a boat.
 
-If you find a bug, open an issue with screenshots and your viewport
+If you find a bug, open an issue with a screenshot and your viewport
 size. If you build one of these and put it in your office, send a
 photo — it'll make my week.
 

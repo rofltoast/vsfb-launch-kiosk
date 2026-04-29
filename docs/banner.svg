@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 540" preserveAspectRatio="xMidYMid slice">
+  <!-- Placeholder banner. Swap docs/banner.png in for the real one when -->
+  <!-- you have it; the README references docs/banner.png so just drop a -->
+  <!-- 1920×540 PNG there and you're done. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0e1f"/>
+      <stop offset="0.55" stop-color="#1a1530"/>
+      <stop offset="1" stop-color="#3a2540"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1530"/>
+      <stop offset="1" stop-color="#0a0815"/>
+    </linearGradient>
+    <radialGradient id="plume" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#fff8d8" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffb84d" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#ffb84d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Sky -->
+  <rect width="1920" height="430" fill="url(#sky)"/>
+  <!-- Stars -->
+  <g fill="#ffffff">
+    <circle cx="120" cy="80" r="2"/>
+    <circle cx="280" cy="40" r="1.5"/>
+    <circle cx="450" cy="120" r="1.5"/>
+    <circle cx="620" cy="60" r="2"/>
+    <circle cx="780" cy="100" r="1"/>
+    <circle cx="940" cy="50" r="1.5"/>
+    <circle cx="1100" cy="90" r="2"/>
+    <circle cx="1260" cy="40" r="1"/>
+    <circle cx="1420" cy="80" r="1.5"/>
+    <circle cx="1580" cy="55" r="2"/>
+    <circle cx="1740" cy="110" r="1"/>
+    <circle cx="200" cy="200" r="1.5"/>
+    <circle cx="520" cy="220" r="1"/>
+    <circle cx="850" cy="180" r="1.5"/>
+    <circle cx="1180" cy="240" r="1"/>
+    <circle cx="1480" cy="190" r="1.5"/>
+    <circle cx="1700" cy="220" r="1"/>
+  </g>
+  <!-- Moon -->
+  <circle cx="160" cy="120" r="35" fill="#5a5a7a" opacity="0.85"/>
+  <circle cx="148" cy="112" r="6" fill="#3a3a5a" opacity="0.6"/>
+  <circle cx="170" cy="130" r="4" fill="#3a3a5a" opacity="0.6"/>
+  <!-- Saturn -->
+  <ellipse cx="1820" cy="100" rx="45" ry="6" fill="none" stroke="#8a7aa0" stroke-width="2" opacity="0.7"/>
+  <circle cx="1820" cy="100" r="22" fill="#8a7aa0"/>
+
+  <!-- Sea -->
+  <rect y="430" width="1920" height="110" fill="url(#sea)"/>
+
+  <!-- Title -->
+  <g font-family="'Press Start 2P', 'Courier New', monospace" fill="#ffffff">
+    <text x="960" y="270" text-anchor="middle" font-size="100" letter-spacing="6">VSFB Launch Kiosk</text>
+    <text x="960" y="340" text-anchor="middle" font-size="34" fill="#9ec5ff" letter-spacing="4">
+      Upcoming Rocket Launches  ·  Live Telemetry
+    </text>
+  </g>
+
+  <!-- Pad + rocket on the right -->
+  <g transform="translate(1660,180)">
+    <!-- launch tower -->
+    <rect x="-10" y="0" width="6" height="240" fill="#2a2535"/>
+    <rect x="-10" y="40" width="20" height="3" fill="#2a2535"/>
+    <rect x="-10" y="100" width="20" height="3" fill="#2a2535"/>
+    <rect x="-10" y="160" width="20" height="3" fill="#2a2535"/>
+    <!-- rocket body -->
+    <rect x="20" y="20" width="22" height="200" fill="#f4f2e8"/>
+    <polygon points="20,20 31,0 42,20" fill="#f4f2e8"/>
+    <rect x="20" y="40" width="22" height="3" fill="#cc4444"/>
+    <!-- engine plume -->
+    <ellipse cx="31" cy="260" rx="55" ry="50" fill="url(#plume)"/>
+    <!-- cloud -->
+    <ellipse cx="31" cy="295" rx="65" ry="14" fill="#ffffff" opacity="0.4"/>
+    <ellipse cx="60" cy="298" rx="40" ry="10" fill="#ffffff" opacity="0.3"/>
+  </g>
+</svg>
