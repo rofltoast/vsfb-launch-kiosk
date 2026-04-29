@@ -94,7 +94,7 @@ software — it's a web app, you can open it on a laptop):
 ## Quick start (the boring 30 seconds)
 
 ```bash
-git clone https://github.com/ikoniak/vsfb-launch-kiosk.git
+git clone https://github.com/rofltoast/vsfb-launch-kiosk.git
 cd vsfb-launch-kiosk
 npm install
 npm run dev

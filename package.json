@@ -6,13 +6,13 @@
   "type": "module",
   "license": "MIT",
   "author": "Josh Koniak <ikoniak@gmail.com>",
-  "homepage": "https://github.com/ikoniak/vsfb-launch-kiosk#readme",
+  "homepage": "https://github.com/rofltoast/vsfb-launch-kiosk#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ikoniak/vsfb-launch-kiosk.git"
+    "url": "git+https://github.com/rofltoast/vsfb-launch-kiosk.git"
   },
   "bugs": {
-    "url": "https://github.com/ikoniak/vsfb-launch-kiosk/issues"
+    "url": "https://github.com/rofltoast/vsfb-launch-kiosk/issues"
   },
   "keywords": [
     "vandenberg",
