@@ -1,0 +1,41 @@
+{
+  "name": "vsfb-launch-kiosk",
+  "version": "1.0.0",
+  "description": "A 24/7 retro-broadcast kiosk + ambient launch tracker for Vandenberg Space Force Base. CRT theme, live YouTube stream, real weather + launch data.",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "author": "Josh Koniak <ikoniak@gmail.com>",
+  "homepage": "https://github.com/ikoniak/vsfb-launch-kiosk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikoniak/vsfb-launch-kiosk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ikoniak/vsfb-launch-kiosk/issues"
+  },
+  "keywords": [
+    "vandenberg",
+    "vsfb",
+    "spacex",
+    "falcon-9",
+    "kiosk",
+    "raspberry-pi",
+    "react",
+    "vite",
+    "youtube-live"
+  ],
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 5173"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}

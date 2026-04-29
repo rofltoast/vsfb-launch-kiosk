@@ -1,0 +1,40 @@
+# --- Build output ---
+dist/
+dist-*/
+*.tsbuildinfo
+
+# --- Dependencies ---
+node_modules/
+
+# --- Local env / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- IDE / OS noise ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Vite cache ---
+.vite/
+
+# --- Logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# --- Release tarballs (we have a graveyard of these from manual deploys) ---
+*.tar.gz
+*.tgz
+
+# --- Photos used during dev that we never want shipped ---
+MECO_PHOTO_HERE.txt
+head-cut.png
+head-raw.png
+porttable.png
