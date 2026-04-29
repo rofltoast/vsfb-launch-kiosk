@@ -248,6 +248,4 @@ photo — it'll make my week.
 
 ## License
 
-## License
-
 MIT - Use freely. Attribution appreciated. Launch scrub jokes mandatory.
