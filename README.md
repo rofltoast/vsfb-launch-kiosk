@@ -1,6 +1,6 @@
 <div align="center">
 
-![VSFB Launch Kiosk · Upcoming Rocket Launches · Live Telemetry](docs/banner.svg)
+![VSFB Launch Kiosk · Upcoming Rocket Launches · Live Telemetry](docs/banner.png)
 
 # VSFB Launch Kiosk
 
@@ -23,7 +23,7 @@ to ambient when it's over.
 
 ## 🛰️ Ambient mode — the "while you wait" view
 
-![Ambient — polished layout](docs/screenshots/ambient-polished.png)
+![Ambient — terminal layout](docs/screenshots/ambient-terminal.png)
 
 The default view, shown 24/7 except during a live ascent. Pulls the
 next-launch information from Launch Library 2 and the weather from NWS,
@@ -54,14 +54,15 @@ itself in the background while you go back to whatever you were doing.
 
 Same data, different vibe. Press `Y` to flip.
 
-**Polished** — cinematic broadcast aesthetic, the screenshot above.
-Photo hero, big magenta countdown, glowing GO/NO-GO pill, rounded
-cards. Designed to look great on a TV from across the room.
+**Terminal** — the original aesthetic, the screenshot above. Bracketed
+`[ TITLE ]` boxes, flat ANSI palettes, monospace-forward,
+*btop++ but for rockets*.
 
-**Terminal** — the original aesthetic. Bracketed `[ TITLE ]` boxes,
-flat ANSI palettes, monospace-forward, *btop++ but for rockets*.
+**Polished** — cinematic broadcast aesthetic. Photo hero, big magenta
+countdown, glowing GO/NO-GO pill, rounded cards. Designed to look
+great on a TV from across the room.
 
-![Ambient — terminal layout](docs/screenshots/ambient-terminal.png)
+![Ambient — polished layout](docs/screenshots/ambient-polished.png)
 
 Mix and match: 7 terminal palettes (tokyo-storm, gruvbox, dracula, nord,
 matrix, catppuccin, solarized) and 6 polished palettes (cosmic-dusk,
@@ -73,7 +74,7 @@ theme picker, `1`–`7` to jump to a palette directly. On phones, tap the
 
 ## 🔥 Live mode — the "it's actually happening" view
 
-![Live — polished layout](docs/screenshots/live-polished.png)
+![Live — terminal layout](docs/screenshots/live-terminal.png)
 
 Auto-engages **20 minutes before T-0** when the launch is `GO`, and
 keeps running until ~10 minutes after the second-stage SECO. The whole
@@ -99,13 +100,13 @@ screen rearranges around the trajectory.
   falls back to a built-in nominal Falcon 9 ascent profile so the show
   goes on regardless
 
-### Live mode also has a terminal layout
+### Live mode also has a polished layout
 
-![Live — terminal layout](docs/screenshots/live-terminal.png)
+![Live — polished layout](docs/screenshots/live-polished.png)
 
-Same data, TUI brackets: `[ MISSION CLOCK ]`, `[ TRAJECTORY ]`,
-`[ WEBCAST ]`, `[ TELEMETRY ]`, `[ EVENTS ]`. Toggle with `Y` like the
-ambient view.
+Same data, broadcast aesthetic: big magenta T-mission-clock front and
+center, photographic feel, soft-glow accent rails, rounded cards.
+Toggle with `Y` like the ambient view.
 
 ---
 

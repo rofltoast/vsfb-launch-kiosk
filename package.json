@@ -1,7 +1,7 @@
 {
   "name": "vsfb-launch-kiosk",
   "version": "1.0.0",
-  "description": "A 24/7 retro-broadcast kiosk + ambient launch tracker for Vandenberg Space Force Base. CRT theme, live YouTube stream, real weather + launch data.",
+  "description": "Browser-based launch kiosk for Vandenberg Space Force Base. Ambient countdown view + real-time trajectory live mode. React + Vite, no backend.",
   "private": false,
   "type": "module",
   "license": "MIT",
