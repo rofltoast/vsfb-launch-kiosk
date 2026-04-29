@@ -21,7 +21,7 @@ real launch + weather data, looks great, and takes care of itself —
 auto-flipping into live mode when something is about to launch and back
 to ambient when it's over.
 
-## 🛰️ Ambient mode — the "while you wait" view
+## Ambient mode — the "while you wait" view
 
 ![Ambient — terminal layout](docs/screenshots/ambient-terminal.png)
 
@@ -32,22 +32,22 @@ itself in the background while you go back to whatever you were doing.
 
 **What you see:**
 
-- 🚀 **Next launch hero** — mission name, rocket, pad, GO/NO-GO status
+- **Next launch hero** — mission name, rocket, pad, GO/NO-GO status
   pill, photographic Falcon-9-on-pad backdrop (in polished layout)
-- ⏱ **Big T-minus countdown** with hours / minutes / seconds broken
+- **Big T-minus countdown** with hours / minutes / seconds broken
   into broadcast-clock digits
-- 🗓 **Liftoff timestamp** in Pacific time + 24-hour countdown progress bar
-- 📋 **Mission card** — payload, customer, orbit, mission type, pad,
+- **Liftoff timestamp** in Pacific time + 24-hour countdown progress bar
+- **Mission card** — payload, customer, orbit, mission type, pad,
   recovery (RTLS / droneship / expendable)
-- 🔧 **Vehicle card** — rocket model, height, diameter, mass, thrust,
+- **Vehicle card** — rocket model, height, diameter, mass, thrust,
   to-LEO mass, plus booster serial + flight count + reuse stats
-- 🌤 **Weather card** — temp, conditions, wind (with compass direction),
+- **Weather card** — temp, conditions, wind (with compass direction),
   humidity, cloud cover, and a 0-100 "viewing conditions" score
-- 📅 **Upcoming launches** — the next 6 VSFB flights, with rideshare
+- **Upcoming launches** — the next 6 VSFB flights, with rideshare
   grouping (`Transporter 17 · Dedicated SSO Rideshare`)
-- 💡 **Rotating fact card** — a launch-history / vehicle-trivia rotator
+- **Rotating fact card** — a launch-history / vehicle-trivia rotator
   that changes every ~8 seconds so the screen never looks dead
-- ⚠ **Sonic boom warning** — auto-shown when the booster is doing an
+- **Sonic boom warning** — auto-shown when the booster is doing an
   RTLS landing (LZ-4 booms inland over Lompoc and Santa Maria)
 
 ### Two layouts to choose from
@@ -68,11 +68,11 @@ Mix and match: 7 terminal palettes (tokyo-storm, gruvbox, dracula, nord,
 matrix, catppuccin, solarized) and 6 polished palettes (cosmic-dusk,
 aurora, ember, midnight-ops, graphite, sunrise). Press `T` to open the
 theme picker, `1`–`7` to jump to a palette directly. On phones, tap the
-🎨 button bottom-right to cycle.
+theme button in the bottom-right to cycle.
 
 ---
 
-## 🔥 Live mode — the "it's actually happening" view
+## Live mode — the "it's actually happening" view
 
 ![Live — terminal layout](docs/screenshots/live-terminal.png)
 
@@ -82,21 +82,21 @@ screen rearranges around the trajectory.
 
 **What you see:**
 
-- 🎯 **Real-time trajectory plot** — altitude (mi) vs. downrange (mi)
+- **Real-time trajectory plot** — altitude (mi) vs. downrange (mi)
   with the rocket's path drawing in as it climbs. Event markers for
   liftoff, max-Q, MECO, stage-sep, SES-1, fairing sep, entry burn,
   landing burn, droneship landing, SECO, payload deploy
-- ⏱ **Mission clock** front and center — `T+00:00:08 · ASCENT`, with
+- **Mission clock** front and center — `T+00:00:08 · ASCENT`, with
   the next event ("MAX-Q in 01:04") highlighted top-right
-- 📊 **Telemetry rail** — ALT, VEL, downrange, dynamic pressure (Q),
+- **Telemetry rail** — ALT, VEL, downrange, dynamic pressure (Q),
   current stage, status, single/dual-stage mode
-- 📺 **Embedded webcast** — the official YouTube webcast in a corner
+- **Embedded webcast** — the official YouTube webcast in a corner
   iframe so you don't have to open another tab
-- 🪂 **Landing-zone card** — drone ship name (`OCISLY · Of Course I Still
+- **Landing-zone card** — drone ship name (`OCISLY · Of Course I Still
   Love You`) or LZ designation, depending on the mission profile
-- 📜 **Event timeline strip** — every flight event lined up at the
+- **Event timeline strip** — every flight event lined up at the
   bottom, lighting up as they happen
-- 🛟 **Graceful degradation** — if FlightClub.io errors, the trajectory
+- **Graceful degradation** — if FlightClub.io errors, the trajectory
   falls back to a built-in nominal Falcon 9 ascent profile so the show
   goes on regardless
 
@@ -162,8 +162,8 @@ software — it's a web app, you can open it on a laptop):
 | `L` | mark a "liftoff anchor" (manual T-0 override for testing live mode) |
 | `Shift+L` | clear the liftoff anchor |
 
-On mobile the 🎨 button bottom-right cycles themes. There is no `T`
-key on a phone. We have made peace with this.
+On mobile the theme button bottom-right cycles themes. There is no
+`T` key on a phone. We have made peace with this.
 
 ---
 

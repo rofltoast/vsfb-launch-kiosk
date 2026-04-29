@@ -21,7 +21,7 @@ repo.
   layouts.
 
 ## v102 — 2026-04
-- Added a mobile-only floating 🎨 theme cycler button. Phones don't
+- Added a mobile-only floating theme cycler button. Phones don't
   have a `T` key; this button cycles through the active palette set
   on each tap. Hidden on desktop via `(max-width: 768px) and (pointer:
   coarse)` so the Pi kiosk displays don't show it either.
@@ -89,7 +89,7 @@ repo.
   routing).
 
 ## v84 — 2026-03
-- 🎉 24/7 YouTube Live stream goes live. The retro broadcast has a
+- 24/7 YouTube Live stream goes live. The retro broadcast has a
   permanent home.
 
 ## v79 — 2026-03
