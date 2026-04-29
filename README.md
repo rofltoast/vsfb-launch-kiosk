@@ -248,4 +248,6 @@ photo — it'll make my week.
 
 ## License
 
-MIT. Have fun. Don't impersonate Space Force.
+## License
+
+MIT - Use freely. Attribution appreciated. Launch scrub jokes mandatory.
