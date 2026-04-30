@@ -2122,60 +2122,30 @@ iframe { border: 0; pointer-events: none; }
 }
 
 /* ============================================================================
- * v106 — NET slip indicator (chip + history strip).
+ * v106 / v108 — NET slip history strip.
  *
- * Quietly surfaces launch-time pushes. The chip ("NET UPDATED +8h 0m")
- * appears when the most recent slip is < 6 hours old; below it, a
- * tiny strip lists the last 3 slips so a viewer can see the cadence
- * at a glance.
+ * Surfaces launch-time pushes as a tiny vertical list of recent slips
+ * beneath the LIFTOFF row. Each row stacks two lines:
  *
- * Theme-token-driven (--accent4 amber for the alert, --warn for
- * negative-magnitude slips, --dim for the strip rows) so it inherits
- * the active palette without per-theme overrides.
+ *     WED 07:00 PM  ⇒  THU 02:42 AM
+ *                  (+8h 0m)
+ *
+ * Two-line per slip is the v108 layout — v107's single-line version
+ * truncated the delta on phone viewports and made the math look wrong.
+ *
+ * Theme-token-driven (--accent4 amber for slip-later, --accent3 green
+ * for moved-earlier, --dim for the prior NET) so every palette works.
  * ============================================================================ */
-.slip-chip-wrap {
+.slip-strip-wrap {
   margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  /* Don't get any wider than the LIFTOFF block we sit beneath; the
-     strip text is small enough that it can otherwise spill into the
-     rocket silhouette space on narrow displays. */
   max-width: 100%;
 }
-.slip-chip-wrap.slip-compact {
+.slip-strip-wrap.slip-compact {
   margin-top: 6px;
   gap: 3px;
-}
-
-.slip-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  padding: 3px 10px 3px 8px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--accent4) 18%, transparent);
-  border: 1px solid var(--accent4);
-  color: var(--accent4);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-  /* Soft pulse so the eye picks it up without it being annoying. */
-  animation: slip-chip-pulse 2.4s ease-in-out infinite;
-}
-.slip-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 6px currentColor;
-}
-@keyframes slip-chip-pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.65; }
 }
 
 .slip-strip {
@@ -2184,29 +2154,65 @@ iframe { border: 0; pointer-events: none; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  /* Each slip row is a 2-line block with a small visual gap from the
+     next; gap here applies between rows, not within a row's two lines. */
+  gap: 6px;
 }
+
 .slip-row {
   display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 11px;
-  letter-spacing: 0.5px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Allow the row to wrap if even the from-arrow-to line can't fit
+     (very narrow viewports). Browsers flow flex children onto multiple
+     visual lines when the inner span is allowed to break. */
+  min-width: 0;
 }
-.slip-from { opacity: 0.7; }
-.slip-arrow { opacity: 0.5; }
+
+.slip-row-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  /* Allow wrapping if the line is still too wide for the viewport
+     (vertical phone in compact UI). Browsers will break between the
+     gap'd children, which is exactly what we want. */
+  flex-wrap: wrap;
+}
+
+.slip-from {
+  opacity: 0.75;
+}
 .slip-to {
   color: var(--fg);
-  font-weight: 500;
-}
-.slip-delta {
   font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 1px;
+}
+
+/* The arrow is the visual anchor — bold, accent-colored, larger than
+   the surrounding text so the eye can scan the column at a glance. */
+.slip-arrow {
+  color: var(--accent2);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  /* Subtle glow so it pops on dark themes without needing a border. */
+  text-shadow: 0 0 6px color-mix(in oklab, var(--accent2) 60%, transparent);
+  /* Force the arrow to its own visual block within the wrap so when
+     the line breaks, the arrow stays paired with the "from" or "to"
+     instead of orphaning. */
+  padding: 0 2px;
+}
+
+.slip-delta {
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  /* Indent slightly so the delta visually hangs beneath the from/to
+     line rather than starting at the same edge. */
+  padding-left: 2px;
 }
 .slip-delta.slip-pos { color: var(--accent4); }   /* slip later — amber */
 .slip-delta.slip-neg { color: var(--accent3); }   /* moved earlier — green */

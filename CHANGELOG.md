@@ -4,6 +4,18 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v108 — 2026-04
+- Removed the standalone "NET UPDATED" pill — the slip strip already
+  carries the magnitude, the pill was redundant.
+- Fixed the slip strip on phone-width viewports. v107's single-line
+  layout (`from → to (delta)`) was hitting `text-overflow: ellipsis`
+  at <500px and dropping the delta off the right side, making the
+  calculations look wrong. v108 stacks each slip across two lines
+  ("from ⇒ to" on top, delta beneath) which fits cleanly at any
+  width.
+- Made the arrow more pronounced — swapped `→` for `⇒`,
+  bumped to 16px, accent-colored, with a soft glow.
+
 ## v107 — 2026-04
 - Backfill slip history from LL2's per-launch updates feed. v106 only
   caught NET changes the kiosk personally observed across consecutive
