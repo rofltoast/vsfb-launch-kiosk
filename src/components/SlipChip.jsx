@@ -55,11 +55,9 @@ export function SlipChip({ launchId, compact = false }) {
       <ul className="slip-strip" aria-label="recent NET changes">
         {recentSlips.map((s, i) => (
           <li key={s.observedAt + '-' + i} className="slip-row">
-            <span className="slip-row-line">
-              <span className="slip-from dim">{formatShortNet(s.fromNet)}</span>
-              <span className="slip-arrow" aria-hidden="true">⇒</span>
-              <span className="slip-to">{formatShortNet(s.toNet)}</span>
-            </span>
+            <span className="slip-from dim">{formatShortNet(s.fromNet)}</span>
+            <span className="slip-arrow" aria-hidden="true">⇒</span>
+            <span className="slip-to">{formatShortNet(s.toNet)}</span>
             <span
               className={`slip-delta ${s.deltaSec >= 0 ? 'slip-pos' : 'slip-neg'}`}
               aria-label={`delta ${formatDelta(s.deltaSec)}`}

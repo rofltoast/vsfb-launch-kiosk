@@ -2154,38 +2154,33 @@ iframe { border: 0; pointer-events: none; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  /* Each slip row is a 2-line block with a small visual gap from the
-     next; gap here applies between rows, not within a row's two lines. */
-  gap: 6px;
+  /* Tight gap between slip rows — each row is now back to a single
+     line (v109), so we don't need the extra breathing room v108 used
+     when each slip was 2 lines tall. */
+  gap: 1px;
 }
 
 .slip-row {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
+  align-items: baseline;
+  /* Slightly smaller gap than v108 so the line stays compact on
+     phones; arrow has its own padding to preserve visual weight. */
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
   font-variant-numeric: tabular-nums;
-  /* Allow the row to wrap if even the from-arrow-to line can't fit
-     (very narrow viewports). Browsers flow flex children onto multiple
-     visual lines when the inner span is allowed to break. */
+  /* CRITICAL fix from v107: do NOT clip+ellipsize. v107 had
+     `white-space: nowrap; overflow: hidden; text-overflow: ellipsis`
+     which truncated the delta off the right side on phones, making
+     the math look wrong. v109 instead allows flex-wrap as a safety
+     net — if a row genuinely can't fit, the delta drops to the next
+     line rather than disappearing. In practice on a 414px viewport
+     with 11px monospace text, the whole row fits. */
+  flex-wrap: wrap;
   min-width: 0;
 }
 
-.slip-row-line {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  /* Allow wrapping if the line is still too wide for the viewport
-     (vertical phone in compact UI). Browsers will break between the
-     gap'd children, which is exactly what we want. */
-  flex-wrap: wrap;
-}
-
-.slip-from {
-  opacity: 0.75;
-}
+.slip-from { opacity: 0.75; }
 .slip-to {
   color: var(--fg);
   font-weight: 600;
@@ -2195,24 +2190,25 @@ iframe { border: 0; pointer-events: none; }
    the surrounding text so the eye can scan the column at a glance. */
 .slip-arrow {
   color: var(--accent2);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1;
-  /* Subtle glow so it pops on dark themes without needing a border. */
   text-shadow: 0 0 6px color-mix(in oklab, var(--accent2) 60%, transparent);
-  /* Force the arrow to its own visual block within the wrap so when
-     the line breaks, the arrow stays paired with the "from" or "to"
-     instead of orphaning. */
-  padding: 0 2px;
+  /* Pull the arrow's visual baseline up a hair so it lines up with
+     the surrounding 11px text (it's larger so its baseline naturally
+     sits lower without this nudge). */
+  position: relative;
+  top: 1px;
 }
 
 .slip-delta {
   font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  /* Indent slightly so the delta visually hangs beneath the from/to
-     line rather than starting at the same edge. */
-  padding-left: 2px;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  /* Push the delta a bit further from the "to" time so the eye
+     parses it as a separate piece of info rather than part of the
+     timestamp. */
+  margin-left: 2px;
 }
 .slip-delta.slip-pos { color: var(--accent4); }   /* slip later — amber */
 .slip-delta.slip-neg { color: var(--accent3); }   /* moved earlier — green */

@@ -4,6 +4,15 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v109 — 2026-04
+- Compacted the slip strip back to one line per slip. v108's two-line
+  layout (from ⇒ to / delta) was readable but ate too much vertical
+  space, especially on phones. v109 puts everything on a single line
+  again — `WED 07:37 PM ⇒ WED 07:42 PM  +4m` — with smaller font
+  + tighter gaps + flex-wrap as the safety net (no more ellipsis
+  truncation). Each slip is back to ~1 line tall while staying
+  readable.
+
 ## v108 — 2026-04
 - Removed the standalone "NET UPDATED" pill — the slip strip already
   carries the magnitude, the pill was redundant.
