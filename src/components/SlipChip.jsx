@@ -47,32 +47,43 @@ export function SlipChip({ launchId, compact = false }) {
 
   if (!entry || !entry.slips || entry.slips.length === 0) return null;
 
-  // Up to 3 most-recent slips, newest-first so the freshest news sits
-  // at the top of the strip.
-  const recentSlips = [...entry.slips].slice(-3).reverse();
+  // v111: sort by the slip's target NET (toNet) descending so the
+  // most-recent-time-the-launch-was-targeting sits at the top. v109
+  // was sorting by `observedAt`, which made stale live-observed pairs
+  // (e.g. v106's "07:00 ⇒ 07:42:49 +42m" with a fresh observedAt)
+  // float above the actually-newer feed-derived slips. Sorting by
+  // toNet means whichever pair points at the latest target NET wins
+  // the top slot, regardless of when it was recorded.
+  const recentSlips = [...entry.slips]
+    .sort((a, b) => {
+      const ta = new Date(a.toNet || 0).getTime();
+      const tb = new Date(b.toNet || 0).getTime();
+      return tb - ta;
+    })
+    .slice(0, 3);
+
+  // v111: if ANY row in the strip needs seconds (because either of
+  // its endpoints has sub-minute precision), render them on EVERY
+  // row so the timestamp column visually lines up. Otherwise the
+  // strip looks ragged with some rows showing seconds and others not.
+  const anyNeedsSeconds = recentSlips.some((s) => slipNeedsSeconds(s));
 
   return (
     <div className={`slip-strip-wrap ${compact ? 'slip-compact' : ''}`}>
       <ul className="slip-strip" aria-label="recent NET changes">
-        {recentSlips.map((s, i) => {
-          // v110: render BOTH timestamps with seconds when either has
-          // sub-minute precision, so a +53s slip doesn't look like
-          // 07:37 ⇒ 07:37 (visually identical). The flag is per-row.
-          const seconds = slipNeedsSeconds(s);
-          return (
-            <li key={s.observedAt + '-' + i} className="slip-row">
-              <span className="slip-from dim">{formatShortNet(s.fromNet, seconds)}</span>
-              <span className="slip-arrow" aria-hidden="true">⇒</span>
-              <span className="slip-to">{formatShortNet(s.toNet, seconds)}</span>
-              <span
-                className={`slip-delta ${s.deltaSec >= 0 ? 'slip-pos' : 'slip-neg'}`}
-                aria-label={`delta ${formatDelta(s.deltaSec)}`}
-              >
-                {formatDelta(s.deltaSec)}
-              </span>
-            </li>
-          );
-        })}
+        {recentSlips.map((s, i) => (
+          <li key={s.observedAt + '-' + i} className="slip-row">
+            <span className="slip-from dim">{formatShortNet(s.fromNet, anyNeedsSeconds)}</span>
+            <span className="slip-arrow" aria-hidden="true">⇒</span>
+            <span className="slip-to">{formatShortNet(s.toNet, anyNeedsSeconds)}</span>
+            <span
+              className={`slip-delta ${s.deltaSec >= 0 ? 'slip-pos' : 'slip-neg'}`}
+              aria-label={`delta ${formatDelta(s.deltaSec)}`}
+            >
+              {formatDelta(s.deltaSec)}
+            </span>
+          </li>
+        ))}
       </ul>
     </div>
   );

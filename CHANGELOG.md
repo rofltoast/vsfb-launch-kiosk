@@ -4,6 +4,22 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v111 — 2026-04
+- Three slip-history fixes:
+  1. Sort by target NET (toNet) descending so the most-recent
+     mission-time-was-targeted always sits at the top. v109 sorted
+     by observedAt, which let stale live-observed wrong pairs (with
+     fresher observedAt timestamps) float above feed-derived correct
+     ones.
+  2. When ANY row in the strip has sub-minute precision, render
+     seconds on EVERY row so the timestamp column visually lines up.
+     v110 was per-row, so a 3-row strip could show 2 rows with
+     seconds and 1 without, looking ragged.
+  3. Bumped slip-history schema to v2. On first load, old (v1)
+     localStorage data is wiped before the LL2 feed populates fresh
+     correct data — viewers no longer have to manually clear cache
+     to see the post-v110 corrected slip pairs.
+
 ## v110 — 2026-04
 - Two slip-history bugs fixed in one pass:
   1. The strip displayed times rounded to the minute, so a +53s slip

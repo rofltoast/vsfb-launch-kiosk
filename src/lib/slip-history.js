@@ -14,6 +14,16 @@
 // indefinitely.
 
 const STORAGE_KEY = 'kiosk-slip-history';
+const SCHEMA_VERSION_KEY = 'kiosk-slip-history-schema';
+// Bump this whenever the storage shape or data semantics change in a
+// way that should invalidate older client data. v111 bumped from
+// implicit-v1 to v2 to clear out stale wrong pairs that v106's live
+// observer wrote across multiple page loads (it could pair the
+// kiosk's current NET against a remembered-but-skipped earlier one,
+// producing real-but-non-adjacent slips like 07:00 ⇒ 07:42:49). The
+// LL2-feed-authoritative seeder in v110 won't overwrite these fast
+// enough to feel right — bumping the schema clears them on load.
+const SCHEMA_VERSION = 2;
 const MAX_SLIPS_PER_LAUNCH = 8;        // keep last 8 slips per launch
 const PURGE_AFTER_LIFTOFF_MS = 24 * 60 * 60 * 1000;  // T+24h
 // "Recent" window for the NET-UPDATED chip — slips within this window
@@ -24,6 +34,16 @@ export const RECENT_SLIP_WINDOW_MS = 6 * 60 * 60 * 1000;
 
 function safeParseStorage() {
   try {
+    // v111: schema check. If the stored schema is older than current
+    // (or absent), wipe slip history and stamp the new version. This
+    // handles cleanly the case where v106-era live-observed wrong
+    // pairs are still hanging around in viewers' localStorage.
+    const storedVersion = parseInt(localStorage.getItem(SCHEMA_VERSION_KEY) || '0', 10);
+    if (!Number.isFinite(storedVersion) || storedVersion < SCHEMA_VERSION) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(SCHEMA_VERSION_KEY, String(SCHEMA_VERSION));
+      return {};
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
