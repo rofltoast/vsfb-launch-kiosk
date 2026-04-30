@@ -4,6 +4,16 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v107 — 2026-04
+- Backfill slip history from LL2's per-launch updates feed. v106 only
+  caught NET changes the kiosk personally observed across consecutive
+  polls; slips that happened before the kiosk loaded were invisible.
+  v107 adds a fetch on next-launch change (and every 5 min after) to
+  /launch/<id>/, parses the human-readable update comments
+  ("Now targeting Apr 30 at 02:42 UTC"), pairs consecutive targets
+  into slip events, and seeds kiosk-slip-history so the SlipChip
+  displays them immediately.
+
 ## v106 — 2026-04
 - Detect launch-time pushes (NET slips) on every LL2 poll. Each launch
   has its own slip history persisted to localStorage, pruned 24h

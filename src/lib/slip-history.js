@@ -121,6 +121,60 @@ export function recordLaunchPoll(launch) {
 }
 
 /**
+ * Seed slip history from an external source (the LL2 updates feed,
+ * v107). Merges the supplied slip events with whatever's already in
+ * storage for this launch ID, deduplicating by (fromNet,toNet) so
+ * re-fetching the same feed doesn't double-count.
+ *
+ * Also updates `lastKnownNet` to the most recent target time observed
+ * across {feed-derived, currently-stored} so the v106 detector picks
+ * up its baseline correctly: future live-poll slips are then deltas
+ * against the last seen NET, not against pre-feed-load null.
+ *
+ * `slips` may be empty (nothing parseable in the feed) — in that case
+ * we no-op rather than write an empty entry.
+ */
+export function seedSlipsFromFeed(launchId, feedSlips, currentLaunchNet) {
+  if (!launchId) return null;
+  if (!Array.isArray(feedSlips) || feedSlips.length === 0) return null;
+
+  const all = safeParseStorage();
+  const prev = all[launchId] || { lastKnownNet: null, slips: [] };
+
+  // Dedup key: "fromNet|toNet". Same slip arriving from feed and
+  // live-observation should collapse to one entry.
+  const seen = new Set((prev.slips || []).map((s) => `${s.fromNet}|${s.toNet}`));
+  const merged = [...(prev.slips || [])];
+  for (const s of feedSlips) {
+    const key = `${s.fromNet}|${s.toNet}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(s);
+  }
+
+  // Sort by observedAt ascending so the strip displays chronologically
+  // regardless of insertion order. Truncate to MAX_SLIPS_PER_LAUNCH
+  // newest-last to bound storage.
+  merged.sort((a, b) => {
+    const ta = a.observedAt ? new Date(a.observedAt).getTime() : 0;
+    const tb = b.observedAt ? new Date(b.observedAt).getTime() : 0;
+    return ta - tb;
+  });
+  const trimmed = merged.slice(-MAX_SLIPS_PER_LAUNCH);
+
+  // lastKnownNet: prefer the launch's CURRENT net (passed in by caller
+  // from the live LL2 fetch) — that's the truest baseline. Falls back
+  // to the toNet of the latest slip if we don't have it.
+  const lastKnownNet =
+    currentLaunchNet ||
+    (trimmed.length > 0 ? trimmed[trimmed.length - 1].toNet : prev.lastKnownNet);
+
+  all[launchId] = { lastKnownNet, slips: trimmed };
+  safeWriteStorage(all);
+  return all[launchId];
+}
+
+/**
  * Get the slip-history entry for a specific launch ID, or null if we
  * haven't tracked any polls for it yet.
  */

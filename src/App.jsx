@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { CONFIG } from './lib/config.js';
 import { fetchUpcomingVSFBLaunches, fetchBoosterHistory, computeReuseStats } from './lib/ll2.js';
-import { recordLaunchPoll } from './lib/slip-history.js';
+import { recordLaunchPoll, seedSlipsFromFeed } from './lib/slip-history.js';
+import { fetchSlipsForLaunch } from './lib/slip-feed.js';
 import { fetchWeatherVSFB } from './lib/weather.js';
 import { findMissionByLL2Id, fetchSimulation, fetchEvents } from './lib/flightclub.js';
 import { pickMockSimulation, pickMockEvents } from './lib/mocks.js';
@@ -638,6 +639,25 @@ export default function App() {
     setDetectedT0(null);
     prevNetRef.current = null;
   }, [nextLaunch?.id]);
+
+  // v107 — pull historical NET-change data from LL2's per-launch
+  // updates feed and seed kiosk-slip-history with it. Runs whenever
+  // the next-launch changes AND every 5 minutes after that, so a
+  // viewer who opened the kiosk before today's slips happened still
+  // sees them once the feed catches up. Failures are swallowed inside
+  // fetchSlipsForLaunch — never throws, never blocks render.
+  useEffect(() => {
+    if (!nextLaunch?.id) return undefined;
+    let cancelled = false;
+    async function loadFeed() {
+      const slips = await fetchSlipsForLaunch(nextLaunch.id);
+      if (cancelled) return;
+      seedSlipsFromFeed(nextLaunch.id, slips, nextLaunch.net);
+    }
+    loadFeed();
+    const id = setInterval(loadFeed, 5 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [nextLaunch?.id, nextLaunch?.net]);
 
   // How stale is our launch data right now? In ms since last successful
   // LL2 fetch (or the cached `savedAt` from boot). Null if we haven't
