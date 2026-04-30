@@ -4,6 +4,14 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v106 — 2026-04
+- Detect launch-time pushes (NET slips) on every LL2 poll. Each launch
+  has its own slip history persisted to localStorage, pruned 24h
+  after liftoff. Surfaces as a "NET UPDATED" pill near the LIFTOFF
+  row when the most recent slip is < 6h old, with a tiny strip
+  beneath listing the last 3 slips ("WED 11PM → THU 07AM (+8h 0m)").
+  Quiet when nothing has changed.
+
 ## v105 — 2026-04
 - Restructured the README to lead with ambient + live (the actual app)
   instead of the optional 24/7 broadcast. Added screenshots of all four

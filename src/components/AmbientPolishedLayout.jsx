@@ -3,6 +3,7 @@ import { formatCountdown } from '../lib/hooks.js';
 import { compassDir, viewingScore } from '../lib/weather.js';
 import { LoadingView } from './LoadingView.jsx';
 import { StaleDataBanner } from './StaleDataBanner.jsx';
+import { SlipChip } from './SlipChip.jsx';
 import { buildFacts, shuffleIndices } from '../lib/quick-facts.js';
 import { groupRideshare } from '../lib/upcoming.js';
 // v46: real VSFB pad-sunset photo, imported so Vite fingerprints + hashes
@@ -154,6 +155,9 @@ function HeroCard({ launch, tMinus }) {
               <div className="ap-hero-liftoff-time">
                 {liftoffParts.time}:00 PDT
               </div>
+              {/* v106 — NET-UPDATED chip + last-3-slips strip. Quiet
+                  when nothing has changed; appears only on a real slip. */}
+              <SlipChip launchId={launch.id} />
             </div>
           )}
         </div>

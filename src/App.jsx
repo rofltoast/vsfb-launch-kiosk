@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { CONFIG } from './lib/config.js';
 import { fetchUpcomingVSFBLaunches, fetchBoosterHistory, computeReuseStats } from './lib/ll2.js';
+import { recordLaunchPoll } from './lib/slip-history.js';
 import { fetchWeatherVSFB } from './lib/weather.js';
 import { findMissionByLL2Id, fetchSimulation, fetchEvents } from './lib/flightclub.js';
 import { pickMockSimulation, pickMockEvents } from './lib/mocks.js';
@@ -339,6 +340,13 @@ export default function App() {
         const list = await fetchUpcomingVSFBLaunches({ limit: 20 });
         if (!mounted) return;
         setLaunches(list);
+        // v106 — slip detection. Each fresh launch is compared against
+        // the previously-stored NET; differences are appended to a
+        // per-launch slip history in localStorage. The view layer reads
+        // this back via getSlipHistory() to show a NET-UPDATED chip + a
+        // tiny strip of recent slips beneath the LIFTOFF row. Side
+        // effect only — no return value needed here.
+        for (const item of list || []) recordLaunchPoll(item);
         // Only cache non-empty responses. An empty array is a valid
         // "nothing scheduled" state but not worth replaying as a
         // fallback — if LL2 goes dark after returning zero launches,

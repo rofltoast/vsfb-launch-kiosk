@@ -4,6 +4,7 @@ import { formatCountdown } from '../lib/hooks.js';
 import { compassDir, viewingScore } from '../lib/weather.js';
 import { LoadingView } from './LoadingView.jsx';
 import { StaleDataBanner } from './StaleDataBanner.jsx';
+import { SlipChip } from './SlipChip.jsx';
 import { buildFacts, shuffleIndices } from '../lib/quick-facts.js';
 import { groupRideshare } from '../lib/upcoming.js';
 // v47: reuse the same Falcon 9 / Falcon Heavy SVG as the polished layout,
@@ -313,6 +314,9 @@ function HeroLaunch({ launch, tMinus, mode }) {
         ) : (
           <span className="accent3" style={{ fontSize: 'clamp(14px, 1vw + 6px, 20px)', fontWeight: 600 }}>TBD</span>
         )}
+        {/* v106 — NET-UPDATED chip + last-3-slips strip. Same component
+            as the polished layout, theme tokens carry the styling. */}
+        <SlipChip launchId={launch.id} compact />
       </div>
 
       {launch.is_rtls && <SonicBoomWarning />}
