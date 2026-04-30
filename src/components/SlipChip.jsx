@@ -3,6 +3,7 @@ import {
   getSlipHistory,
   formatDelta,
   formatShortNet,
+  slipNeedsSeconds,
 } from '../lib/slip-history.js';
 
 /**
@@ -53,19 +54,25 @@ export function SlipChip({ launchId, compact = false }) {
   return (
     <div className={`slip-strip-wrap ${compact ? 'slip-compact' : ''}`}>
       <ul className="slip-strip" aria-label="recent NET changes">
-        {recentSlips.map((s, i) => (
-          <li key={s.observedAt + '-' + i} className="slip-row">
-            <span className="slip-from dim">{formatShortNet(s.fromNet)}</span>
-            <span className="slip-arrow" aria-hidden="true">⇒</span>
-            <span className="slip-to">{formatShortNet(s.toNet)}</span>
-            <span
-              className={`slip-delta ${s.deltaSec >= 0 ? 'slip-pos' : 'slip-neg'}`}
-              aria-label={`delta ${formatDelta(s.deltaSec)}`}
-            >
-              {formatDelta(s.deltaSec)}
-            </span>
-          </li>
-        ))}
+        {recentSlips.map((s, i) => {
+          // v110: render BOTH timestamps with seconds when either has
+          // sub-minute precision, so a +53s slip doesn't look like
+          // 07:37 ⇒ 07:37 (visually identical). The flag is per-row.
+          const seconds = slipNeedsSeconds(s);
+          return (
+            <li key={s.observedAt + '-' + i} className="slip-row">
+              <span className="slip-from dim">{formatShortNet(s.fromNet, seconds)}</span>
+              <span className="slip-arrow" aria-hidden="true">⇒</span>
+              <span className="slip-to">{formatShortNet(s.toNet, seconds)}</span>
+              <span
+                className={`slip-delta ${s.deltaSec >= 0 ? 'slip-pos' : 'slip-neg'}`}
+                aria-label={`delta ${formatDelta(s.deltaSec)}`}
+              >
+                {formatDelta(s.deltaSec)}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

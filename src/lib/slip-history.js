@@ -122,17 +122,24 @@ export function recordLaunchPoll(launch) {
 
 /**
  * Seed slip history from an external source (the LL2 updates feed,
- * v107). Merges the supplied slip events with whatever's already in
- * storage for this launch ID, deduplicating by (fromNet,toNet) so
- * re-fetching the same feed doesn't double-count.
+ * v107). The feed is canonical for any NET change LL2 has recorded —
+ * v110 makes this the AUTHORITATIVE source: when feedSlips is non-
+ * empty, we replace the stored slips for this launch with the feed
+ * data, then re-append any live-observed slips that post-date the
+ * newest feed entry (i.e. happened after our last LL2 detail fetch).
  *
- * Also updates `lastKnownNet` to the most recent target time observed
- * across {feed-derived, currently-stored} so the v106 detector picks
- * up its baseline correctly: future live-poll slips are then deltas
- * against the last seen NET, not against pre-feed-load null.
+ * Why: v106's live observer creates slip pairs by comparing the
+ * current NET against whatever the kiosk last saw, which can skip
+ * intermediate values across page loads. That produces invalid pairs
+ * like "07:00 PM ⇒ 07:42 PM (+42m)" when the real timeline went
+ * 07:00 → 07:37 → 07:37:53 → 07:42:49. The feed has the correct
+ * sequence; trust it.
  *
- * `slips` may be empty (nothing parseable in the feed) — in that case
- * we no-op rather than write an empty entry.
+ * `currentLaunchNet` is used to set lastKnownNet so v106's future
+ * polls compare against the right baseline.
+ *
+ * Returns null and no-ops when feedSlips is empty (LL2 feed didn't
+ * parse anything) so we don't clobber existing data with nothing.
  */
 export function seedSlipsFromFeed(launchId, feedSlips, currentLaunchNet) {
   if (!launchId) return null;
@@ -141,20 +148,27 @@ export function seedSlipsFromFeed(launchId, feedSlips, currentLaunchNet) {
   const all = safeParseStorage();
   const prev = all[launchId] || { lastKnownNet: null, slips: [] };
 
-  // Dedup key: "fromNet|toNet". Same slip arriving from feed and
-  // live-observation should collapse to one entry.
-  const seen = new Set((prev.slips || []).map((s) => `${s.fromNet}|${s.toNet}`));
-  const merged = [...(prev.slips || [])];
-  for (const s of feedSlips) {
-    const key = `${s.fromNet}|${s.toNet}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    merged.push(s);
-  }
+  // Find the timestamp of the newest feed entry. Any live-observed
+  // slip that arrived AFTER this is something the feed hasn't caught
+  // up to yet — preserve it. Slips before this are superseded by the
+  // feed's authoritative ordering.
+  const newestFeedAt = feedSlips.reduce((acc, s) => {
+    const t = s.observedAt ? new Date(s.observedAt).getTime() : 0;
+    return t > acc ? t : acc;
+  }, 0);
 
-  // Sort by observedAt ascending so the strip displays chronologically
-  // regardless of insertion order. Truncate to MAX_SLIPS_PER_LAUNCH
-  // newest-last to bound storage.
+  // Live-observed extras: kept only if they happened post-feed AND
+  // their (fromNet,toNet) pair isn't already in the feed.
+  const feedKeys = new Set(feedSlips.map((s) => `${s.fromNet}|${s.toNet}`));
+  const liveExtras = (prev.slips || []).filter((s) => {
+    if (feedKeys.has(`${s.fromNet}|${s.toNet}`)) return false;
+    const t = s.observedAt ? new Date(s.observedAt).getTime() : 0;
+    return t > newestFeedAt;
+  });
+
+  const merged = [...feedSlips, ...liveExtras];
+  // Sort chronologically by observedAt so the strip walks
+  // oldest→newest internally; SlipChip reverses for display.
   merged.sort((a, b) => {
     const ta = a.observedAt ? new Date(a.observedAt).getTime() : 0;
     const tb = b.observedAt ? new Date(b.observedAt).getTime() : 0;
@@ -162,9 +176,6 @@ export function seedSlipsFromFeed(launchId, feedSlips, currentLaunchNet) {
   });
   const trimmed = merged.slice(-MAX_SLIPS_PER_LAUNCH);
 
-  // lastKnownNet: prefer the launch's CURRENT net (passed in by caller
-  // from the live LL2 fetch) — that's the truest baseline. Falls back
-  // to the toNet of the latest slip if we don't have it.
   const lastKnownNet =
     currentLaunchNet ||
     (trimmed.length > 0 ? trimmed[trimmed.length - 1].toNet : prev.lastKnownNet);
@@ -205,25 +216,55 @@ export function formatDelta(deltaSec) {
 
 /**
  * Format an ISO NET timestamp as a short Pacific-time string —
- * "WED 07:00 PM PDT". Used in the slip-history strip so viewers can
- * read at a glance "23:00 went to 07:00".
+ * "WED 07:00 PM" by default, or "WED 07:00:53 PM" when `withSeconds`
+ * is true. Used in the slip-history strip so viewers can read at a
+ * glance "23:00 went to 07:00".
+ *
+ * v110: callers can opt into sub-minute precision when displaying a
+ * slip whose magnitude is < 60s, OR whose endpoints don't share the
+ * same minute boundary. Without this, +53s slips render as
+ * "07:37 PM ⇒ 07:37 PM" (visually identical), making the math look
+ * wrong.
  */
-export function formatShortNet(iso) {
+export function formatShortNet(iso, withSeconds = false) {
   if (!iso) return '—';
   try {
     const d = new Date(iso);
-    const date = d.toLocaleString('en-US', {
+    const opts = {
       timeZone: 'America/Los_Angeles',
       weekday: 'short',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    };
+    if (withSeconds) opts.second = '2-digit';
+    const date = d.toLocaleString('en-US', opts);
     // toLocaleString returns "Wed, 07:00 PM" — uppercase + drop the
     // weekday's trailing comma so the chip reads as a single tight unit.
     return date.replace(',', '').toUpperCase();
   } catch {
     return iso;
   }
+}
+
+/**
+ * v110: should this slip be rendered with sub-minute precision in
+ * the strip? Returns true when EITHER endpoint has non-zero seconds
+ * (i.e. minute-rounding would visually flatten the difference). The
+ * caller flips both endpoints together so the row stays consistent.
+ */
+export function slipNeedsSeconds(slip) {
+  if (!slip) return false;
+  for (const iso of [slip.fromNet, slip.toNet]) {
+    if (!iso) continue;
+    const d = new Date(iso);
+    if (!Number.isFinite(d.getTime())) continue;
+    if (d.getUTCSeconds() !== 0) return true;
+  }
+  // Edge case: same-minute slip (delta < 60s) but endpoints both have
+  // zero seconds — shouldn't happen in real LL2 data but cheap to
+  // guard against.
+  if (Math.abs(slip.deltaSec) < 60) return true;
+  return false;
 }
 
 /**

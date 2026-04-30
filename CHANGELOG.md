@@ -4,6 +4,22 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v110 — 2026-04
+- Two slip-history bugs fixed in one pass:
+  1. The strip displayed times rounded to the minute, so a +53s slip
+     showed `07:37 PM ⇒ 07:37 PM` (visually identical) and a +4m 56s
+     slip showed `07:37 PM ⇒ 07:42 PM +4m` (looking like +5m). Now
+     when either endpoint has non-zero seconds the row renders both
+     timestamps with seconds precision.
+  2. The LL2 updates feed is now AUTHORITATIVE for any slips it
+     covers. v107's seeder merged-but-didn't-replace, which left
+     stale invalid pairs from v106's live observer (e.g.
+     "07:00 PM ⇒ 07:42 PM +42m" — a real timestamp pair, but not
+     adjacent in the actual timeline). v110 replaces the stored slips
+     with the feed's authoritative sequence on every fetch, then
+     re-appends only live-observed slips that post-date the newest
+     feed entry.
+
 ## v109 — 2026-04
 - Compacted the slip strip back to one line per slip. v108's two-line
   layout (from ⇒ to / delta) was readable but ate too much vertical
