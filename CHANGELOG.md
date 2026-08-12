@@ -4,6 +4,16 @@ All notable changes to the VSFB Launch Kiosk. Version numbers correspond
 to the internal `v##` ship tags used in code comments throughout the
 repo.
 
+## v112 — 2026-08
+- Mobile can now unmute the live webcast. The mute toggle previously
+  lived only on the `M` hotkey, which iPhone/Android viewers have no
+  way to press. Added a transparent double-tap surface over the YouTube
+  iframe (`WebcastPanel`) so a double-tap toggles mute on touch devices
+  — and a double-click does the same on desktop. `touchAction:
+  manipulation` suppresses the browser's double-tap-to-zoom so the
+  gesture is unambiguous. The in-frame hint now reads "double-tap to
+  unmute" on coarse-pointer devices and keeps "press M" on keyboards.
+
 ## v111 — 2026-04
 - Three slip-history fixes:
   1. Sort by target NET (toNet) descending so the most-recent

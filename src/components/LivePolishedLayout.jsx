@@ -437,21 +437,69 @@ function LiveStatusRibbon({ events, tPlus }) {
  * v30 brief ("move label INSIDE video frame"). No Box chrome — just the
  * video surface. Delay note + mission caption live below the iframe.
  *
- * Mute/unmute hotkey (M):
+ * Mute/unmute — two input paths, one behavior:
  *   The iframe loads muted by default because Chromium + mobile Safari
- *   both block unmuted autoplay without a user gesture. We wire up a
- *   global keydown listener that toggles the YouTube player's mute
- *   state via the IFrame Player API (postMessage — no script tag
- *   needed, just `enablejsapi=1` in the URL). `M` is the same mute
- *   shortcut YouTube itself uses, so it's instantly learnable.
+ *   both block unmuted autoplay without a user gesture. We toggle the
+ *   YouTube player's mute state via the IFrame Player API (postMessage
+ *   — no script tag needed, just `enablejsapi=1` in the URL).
  *
- *   The hotkey hint lives in the top-right corner of the video frame
- *   (balancing the LIVE/DEMO badge in the top-left), and updates its
- *   text live as mute state changes.
+ *   Desktop: the `M` hotkey — the same mute shortcut YouTube itself
+ *   uses, so it's instantly learnable.
+ *
+ *   Mobile (iPhone/Android): a double-tap on the video toggles mute.
+ *   Phones have no keyboard, and the YouTube iframe is a cross-origin
+ *   document so taps inside it never reach us — so we lay a transparent
+ *   overlay over the iframe and detect a double-tap on it (two pointer
+ *   releases within 300ms, near the same spot). `touchAction:
+ *   'manipulation'` suppresses the browser's own double-tap-to-zoom so
+ *   the gesture is ours alone. The same overlay also fires on a mouse
+ *   double-click, so desktop gets the gesture too.
+ *
+ *   The hint lives in the top-right corner of the video frame
+ *   (balancing the LIVE/DEMO badge in the top-left), updates its text
+ *   live as mute state changes, and adapts its instruction to the input
+ *   device (double-tap on touch, press M on a keyboard).
  * ========================================================================== */
 export function WebcastPanel({ ytId, startSeconds, isDemo, launch }) {
   const iframeRef = useRef(null);
   const [muted, setMuted] = useState(true);
+
+  // Coarse pointer ⇒ touch device (phone/tablet). Drives the hint copy
+  // so mobile viewers are told to double-tap rather than "press M".
+  const isTouch = useMemo(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false;
+    return window.matchMedia('(pointer: coarse)').matches;
+  }, []);
+
+  // Single source of truth for flipping mute state, shared by the M
+  // hotkey and the double-tap overlay. Posts the YouTube IFrame Player
+  // API command and mirrors the state into React so the hint updates.
+  const applyMute = useRef(null);
+  applyMute.current = (nextMuted) => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
+    iframe.contentWindow.postMessage(
+      JSON.stringify({
+        event: 'command',
+        func: nextMuted ? 'mute' : 'unMute',
+        args: '',
+      }),
+      '*',
+    );
+    // Also bump the volume explicitly the first time we unmute — some
+    // YouTube clients remember a 0% volume from a previous session.
+    if (!nextMuted) {
+      iframe.contentWindow.postMessage(
+        JSON.stringify({
+          event: 'command',
+          func: 'setVolume',
+          args: [80],
+        }),
+        '*',
+      );
+    }
+    setMuted(nextMuted);
+  };
 
   // Keyboard mute-toggle listener. Only active when we actually have a
   // YouTube iframe loaded (ytId present). Ignores M when focus is in a
@@ -463,38 +511,32 @@ export function WebcastPanel({ ytId, startSeconds, isDemo, launch }) {
       if (e.ctrlKey || e.metaKey || e.altKey) return; // allow Cmd+M etc.
       const tag = e.target?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-
-      const iframe = iframeRef.current;
-      if (!iframe || !iframe.contentWindow) return;
+      if (!iframeRef.current || !iframeRef.current.contentWindow) return;
       e.preventDefault();
-      // Post a command to the YouTube IFrame Player API. Works as long as
-      // `enablejsapi=1` is in the iframe URL (added below).
-      const nextMuted = !muted;
-      iframe.contentWindow.postMessage(
-        JSON.stringify({
-          event: 'command',
-          func: nextMuted ? 'mute' : 'unMute',
-          args: '',
-        }),
-        '*',
-      );
-      // Also bump the volume explicitly the first time we unmute — some
-      // YouTube clients remember a 0% volume from a previous session.
-      if (!nextMuted) {
-        iframe.contentWindow.postMessage(
-          JSON.stringify({
-            event: 'command',
-            func: 'setVolume',
-            args: [80],
-          }),
-          '*',
-        );
-      }
-      setMuted(nextMuted);
+      applyMute.current(!muted);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [ytId, muted]);
+
+  // Double-tap / double-click detector for the overlay. Tracks the last
+  // pointer release (time + position); a second release within 300ms and
+  // ~40px counts as a double-tap and toggles mute. Works for touch and
+  // mouse alike via pointer events, so no separate onDoubleClick needed.
+  const lastTap = useRef({ t: 0, x: 0, y: 0 });
+  const onOverlayPointerUp = (e) => {
+    const now = e.timeStamp;
+    const prev = lastTap.current;
+    const dt = now - prev.t;
+    const dx = Math.abs(e.clientX - prev.x);
+    const dy = Math.abs(e.clientY - prev.y);
+    if (dt > 0 && dt < 300 && dx < 40 && dy < 40) {
+      lastTap.current = { t: 0, x: 0, y: 0 }; // consume — avoid triple-tap chaining
+      applyMute.current(!muted);
+      return;
+    }
+    lastTap.current = { t: now, x: e.clientX, y: e.clientY };
+  };
 
   const liveBadge = (
     <div
@@ -547,22 +589,28 @@ export function WebcastPanel({ ytId, startSeconds, isDemo, launch }) {
         {muted ? '🔇' : '🔊'}
       </span>
       <span>
-        press&nbsp;
-        <kbd
-          style={{
-            display: 'inline-block',
-            padding: '0 5px',
-            fontFamily: 'inherit',
-            fontSize: '0.95em',
-            fontWeight: 800,
-            color: '#000',
-            background: muted ? 'var(--accent1)' : '#3ecf6b',
-            borderRadius: 2,
-            letterSpacing: 0,
-          }}
-        >
-          M
-        </kbd>
+        {isTouch ? (
+          <>double-tap</>
+        ) : (
+          <>
+            press&nbsp;
+            <kbd
+              style={{
+                display: 'inline-block',
+                padding: '0 5px',
+                fontFamily: 'inherit',
+                fontSize: '0.95em',
+                fontWeight: 800,
+                color: '#000',
+                background: muted ? 'var(--accent1)' : '#3ecf6b',
+                borderRadius: 2,
+                letterSpacing: 0,
+              }}
+            >
+              M
+            </kbd>
+          </>
+        )}
         &nbsp;to {muted ? 'unmute' : 'mute'}
       </span>
     </div>
@@ -631,6 +679,27 @@ export function WebcastPanel({ ytId, startSeconds, isDemo, launch }) {
           allowFullScreen
           style={{ width: '100%', height: '100%', border: 0 }}
           title={isDemo ? 'demo webcast' : 'live webcast'}
+        />
+        {/*
+          Transparent double-tap surface. The YouTube embed runs with
+          controls=0, so there are no in-frame controls to steal — this
+          overlay's only job is to catch a double-tap/double-click and
+          toggle mute. `touchAction: manipulation` kills the mobile
+          double-tap-to-zoom so the gesture stays ours; the badges above
+          sit at higher z-index (2) and keep pointerEvents:none, so they
+          never block it.
+        */}
+        <div
+          onPointerUp={onOverlayPointerUp}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            cursor: 'pointer',
+            touchAction: 'manipulation',
+            background: 'transparent',
+          }}
+          aria-hidden="true"
         />
       </div>
       {!isDemo && <WebcastDelayNote />}
